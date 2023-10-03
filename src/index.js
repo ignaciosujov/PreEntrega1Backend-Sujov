@@ -11,42 +11,38 @@ class ProductManager {
         this.productIdCounter = 1;
         this.path = '../products.txt'
     }
-
-    addProduct(title, description, price, thumbnail, code, stock) {
-        // Validar que todos los campos sean obligatorios
-
-        if (!title || !description || !price || !thumbnail || !code || !stock) {
-            console.error('Todos los campos son obligatorios');
-            return;
+    
+    async addProduct(title, description, price, thumbnail, code, stock, category, status) {
+        try{
+        
+        
+            const product = {
+                id: this.productIdCounter++,
+                title,
+                description,
+                price,
+                thumbnail,
+                code,
+                stock,
+                category,
+                status,
+            };
+        
+            //Guardamos en el array el producto
+            this.products.push(product);
+        
+            //Escribimos en el archivo externo el array
+            fs.writeFile(this.path, JSON.stringify(this.products, null, 2), (err) => {
+                if(err){
+                    console.log('no se pudo escribir')
+                }
+            }) 
+            console.log('Producto agregado:', product);
+            
+        }catch(err){
+            console.error('Error al agregar producto', err)
+            throw err
         }
-
-        // Validar que el campo "code" no esté repetido
-
-        if (this.products.some((product) => product.code === code)) {
-            console.error('El código ya existe');
-            return;
-        }
-
-        const product = {
-            id: this.productIdCounter++,
-            title,
-            description,
-            price,
-            thumbnail,
-            code,
-            stock,
-        };
-
-        //Guardamos en el array el producto
-        this.products.push(product);
-
-        //Escribimos en el archivo externo el array
-        fs.writeFile(this.path, JSON.stringify(this.products, null, 2), (err) => {
-            if(err){
-                console.log('no se pudo escribir')
-            }
-        }) 
-        console.log('Producto agregado:', product);
 
     }
 
@@ -115,11 +111,8 @@ class ProductManager {
             return err
         }
     }
-    async updateProduct(id, title, description, price, thumbnail, code, stock){
-        if (!title || !description || !price || !thumbnail || !code || !stock) {
-            console.error('Todos los campos son obligatorios');
-            return;
-        }else{
+    async updateProduct(id, title, description, price, thumbnail, code, stock, category, status){
+    
             const objeto = {
                 id: id,
                 title: title,
@@ -128,6 +121,8 @@ class ProductManager {
                 thumbnail: thumbnail,
                 code: code,
                 stock: stock,
+                category: category,
+                status: status
             }
             try{
                 //leemos el archivo para luego buscar el id del producto
@@ -150,11 +145,10 @@ class ProductManager {
                 return err
             }
         }
-
-        }
-
+        
 
 }
+
 
 
 const manager = new ProductManager();
@@ -162,16 +156,8 @@ const manager = new ProductManager();
 manager.addProduct('Producto 1', 'Descripcion1', 200, 'img', 'ABC123', 10);
 manager.addProduct('Producto 2', 'Descripcion2', 150, 'img', 'BCA456', 20);     
 manager.addProduct('Producto 3', 'Descripcion3', 100, 'img', 'ASD456', 5);     
-manager.addProduct('Producto 4', 'Descripcion4', 50, 'img', 'GRE456', 15);     
+manager.addProduct('Producto 4', 'Descripcion4', 500, 'img', 'GRE456', 15);     
 
 
-/* console.log(`Lista de productos: ${manager.getProducts()}`);    //mostrar lista de productos
-console.log(manager.getProductById(2))  //obtener un producto con el id "2"
-
-
-//NOTA: al querer eliminar y actualizar un producto al mismo tiempo, no parece funcionar bien, imagino que se debe a que son async las 2 y superponen tareas.
-manager.deleteProduct(4)  //eliminar producto con el id "3"
- */
-//manager.updateProduct(2, 'productActualizado3', 'actualizacion de producto', 400, 'img', 'ASD879', 7)  //actualizar producto con el id "2"
 
 export default ProductManager;
