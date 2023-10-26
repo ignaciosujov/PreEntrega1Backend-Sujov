@@ -5,6 +5,8 @@ import __dirname from './util.js'
 import { Server } from 'socket.io'
 import router from '../routes/views.router.js'
 import ProductManager from './productManager.js'
+import mongoose from 'mongoose'
+
 
 
 const app = express()
@@ -18,10 +20,24 @@ app.use(express.static(__dirname + '/public'))
 
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
-const httpServer = app.listen(8080, () => console.log('Server activo en puerto: 8080'))
-export const io = new Server(httpServer)
+app.use('/product', router)
+
+// const io = new Server(httpServer)
+
+
+mongoose.connect('mongodb+srv://ignaciosujov:4W4FIUeEU6lt1wTx@cluster0.denqn1r.mongodb.net/', {dbName: 'ecommerce'}) //aca pusimos el link que aparece en mongo de internet cuando ponemos connect y ponemos driver
+
+    .then(() => {
+        console.log('DB connected OK')
+        const httpServer = app.listen(8080, () => console.log('Server activo en puerto: 8080'))
+        
+    })
+    .catch(e => {
+        console.error('Error connecting to DB')
+    })
+
 
 
 const manager = new ProductManager()
@@ -48,7 +64,7 @@ app.get('/realtimeproducts', async (req, res) => {
     }
 });
 
-io.on('connection', (socket) => {
+/* io.on('connection', (socket) => {
     console.log('Nuevo cliente conectado');
 
     socket.on('createProduct', async ({ title, description, price, code, stock, category, thumbnail }) => {
@@ -76,8 +92,8 @@ io.on('connection', (socket) => {
 });
 
 io.emit('updateProducts', await manager.getProducts())
+ */
 
 
-
-app.use('/', router)
+// app.use('/', router)
 

@@ -84,7 +84,9 @@ router.post('/carts/:cid/product/:pid', (req, res) => {
             productExist.quantity += 1;
         } else {
             // Si el producto no existe, agregarlo al carrito con cantidad 1
-            cart.products.push({ product: productId, quantity: 1 });
+            cart.products.push({
+                product: productId,
+                quantity: 1 });
         }
 
         fs.writeFile('carts.txt', JSON.stringify(carts), (err) => {
